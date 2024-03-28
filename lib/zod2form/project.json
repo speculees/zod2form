@@ -1,0 +1,19 @@
+{
+  "name": "zod2form",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "lib/zod2form/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/lib/zod2form",
+        "main": "lib/zod2form/src/index.ts",
+        "tsConfig": "lib/zod2form/tsconfig.lib.json",
+        "assets": ["lib/zod2form/*.md"]
+      }
+    }
+  },
+  "tags": []
+}
