@@ -1,18 +1,18 @@
 import * as z from 'zod';
 import deriveInputs from './derive-inputs';
 
-const user = {
-    id: z.string().uuid().optional(),
-    firstName: z.string().optional().describe('First Name'),
-    lastName: z.string().optional(),
-    userName: z.string(),
-    picture: z.string().url(),
-    email: z.string().email(),
-    age: z.number(),
-    isActive: z.boolean(),
+export const user = {
+    id: z.string().uuid().optional().default('123e4567-e89b-12d3-a456-426614174000'),
+    firstName: z.string().optional().describe('First Name').default('John'),
+    lastName: z.string().optional().default('Doe'),
+    userName: z.string().default('johndoe'),
+    picture: z.string().url().default('https://i.pravatar.cc/300'),
+    email: z.string().email().default('johndoe@me.com'),
+    age: z.number().default(25),
+    isActive: z.boolean().default(true),
 };
 
-const location = {
+export const location = {
     address: z.string().optional().describe('Address'),
     city: z.string().optional().describe('City'),
     state: z.string().optional().describe('State'),
