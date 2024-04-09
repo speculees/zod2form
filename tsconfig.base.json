@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "zod2form": ["lib/zod2form/src/index.ts"]
+      "@speculees/zod2form": ["lib/zod2form/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
