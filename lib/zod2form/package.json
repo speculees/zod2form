@@ -1,11 +1,28 @@
 {
   "name": "zod2form",
-  "version": "0.0.1",
-  "dependencies": {
-    "tslib": "^2.3.0"
+  "author": "speculees",
+  "license": "MIT",
+  "contributors": [
+    "speculees@gmail.com"
+  ],
+  "description": "parse zod schema to form inputs and default values",
+  "keywords": [
+    "zod", "form", "react", "react-hook-form"
+  ],
+  "homepage": "https://github.com/speculees/zod2form#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/speculees/zod2form.git"
   },
+  "version": "0.0.1",
   "type": "commonjs",
   "main": "./src/index.js",
   "typings": "./src/index.d.ts",
-  "private": true
+  "private": false,
+  "devDependencies": {
+    "tslib": "^2.6.2"
+  },
+  "peerDependencies": {
+    "zod": "3.*"
+  }
 }

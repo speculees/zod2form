@@ -115,6 +115,12 @@ importers:
       webpack-cli: 5.1.4_webpack@5.91.0
       zod: 3.22.4
 
+  lib/zod2form:
+    specifiers:
+      tslib: ^2.6.2
+    devDependencies:
+      tslib: 2.6.2
+
 packages:
 
   /@aashutoshrathi/word-wrap/1.2.6:
