@@ -13,8 +13,35 @@ export type InputType = {
     options?: InputTypeOption[];
 };
 
+
+/**
+ * Options for deriving input types from a ZodObject schema.
+ */
 export type DeriveInputOptions = {
+    /**
+     * The name of the property on which to output the input types.
+     *
+     * - `'inline'`: Outputs input types for each property of the schema, in the
+     *   order they were defined. If a property has a description, and
+     *   `object.description` is not set to `false`, outputs a fieldset with
+     *   that description as the legend.
+     * - `'grouped'`: Not currently implemented. Outputs input types for each
+     *   property of the schema, grouped together in a single fieldset.
+     *
+     * Defaults to `'inline'`.
+     */
     outputName?: 'inline' | 'grouped';
+    /**
+     * Options for handling object properties (ZodObject).
+     */
+    object?: {
+        /**
+         * Whether to include the description of an object property as a
+         * fieldset legend when outputting input types for that property. If not
+         * set, defaults to `true`. Set to `false` to skip this behavior.
+         */
+        description?: boolean;
+    }
 }
 
 /**
@@ -29,6 +56,7 @@ function deriveInputs<T extends z.ZodRawShape>(
 ) {
     const inputs: InputType[] = []; 
     const keys = Object.keys(schema.shape);
+    const _options = {outputName: 'inline', ...options } as DeriveInputOptions;
 
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
@@ -47,16 +75,22 @@ function deriveInputs<T extends z.ZodRawShape>(
             updateFromZodUnion(element, input);
 
             if (Utils.isZodObject(element)) {
-                if (options.outputName === 'inline') {
-                    updateFromZodObjectAsInline(element, input, inputs);
-                } else if (options.outputName === 'grouped') {
+                if (_options.outputName === 'inline') {
+                    const addDescription = _options.object?.description !== false && element.description;
+                    console.log(addDescription);
+                    if (addDescription) {
+                        inputs.push({ name: key, placeholder: element.description, type: 'fieldset' });
+                    }
+
+                    updateFromZodObjectAsInline(element, input, inputs, _options);
+                } else if (_options.outputName === 'grouped') {
                     throw new Error('Not implemented');
                 }
 
                 continue;
             }
 
-            inputs.push(input)
+            inputs.push(input);
         }
     }
 
@@ -123,8 +157,8 @@ function updateFromZodUnion(element: z.ZodTypeAny, input: InputType) {
     }
 }
 
-function updateFromZodObjectAsInline(element: z.ZodObject<z.ZodRawShape>, input: InputType, inputs: InputType[]) {
-    const _inputs = deriveInputs(element);
+function updateFromZodObjectAsInline(element: z.ZodObject<z.ZodRawShape>, input: InputType, inputs: InputType[], options: DeriveInputOptions) {
+    const _inputs = deriveInputs(element, options);
 
     for (const _input of _inputs) {
         _input.name = `${input.name}.${_input.name}`;

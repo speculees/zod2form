@@ -93,5 +93,44 @@ describe('deriveInputs', () => {
             expect(inputs.length)
                 .toEqual(Object.keys(user).length + Object.keys(location).length);
         });
+
+        describe('options', () => {
+            it('sets fieldset if object description is set', () => {
+                const schema = z.object({ ...user, location: z
+                    .object({ ...location })
+                    .describe('Location')
+                });
+
+                const inputs = deriveInputs(schema);
+
+                expect(inputs.length)
+                    .toEqual(
+                        Object.keys(user).length + Object.keys(location).length + 1
+                    );
+            });
+
+            it('does not set fieldset if object description is not set', () => {
+                const schema = z.object({ ...user, location: z.object({ ...location }) });
+
+                const inputs = deriveInputs(schema);
+                expect(inputs.length)
+                    .toEqual(
+                        Object.keys(user).length + Object.keys(location).length
+                    )
+            });
+
+            it('dos not set fieldset if options object description is false', () => {
+                const schema = z.object({ ...user, location: z
+                    .object({ ...location })
+                    .describe('Location')
+                });
+
+                const inputs = deriveInputs(schema, { object: { description: false } });
+                console.log(inputs);
+                expect(inputs.length).toEqual(
+                    Object.keys(user).length + Object.keys(location).length
+                );
+            });
+        });
     });
 });
