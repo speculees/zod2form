@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import * as Utils from './utils';
 
-function deriveDefaultValues<T extends z.ZodRawShape>(schema: z.ZodObject<T>) {
+function deriveDefaultValues(schema: z.ZodObject<z.ZodRawShape>) {
     let defaultValue: unknown;
     const defaultValues: Record<string, unknown> = {};
     const keys = Object.keys(schema.shape);
@@ -31,7 +31,7 @@ function deriveDefaultValues<T extends z.ZodRawShape>(schema: z.ZodObject<T>) {
 
     }
 
-    return defaultValues as T;
+    return defaultValues as z.infer<typeof schema>;
 }
 
 export default deriveDefaultValues;
