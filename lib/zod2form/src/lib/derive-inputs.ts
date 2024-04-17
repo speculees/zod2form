@@ -4,15 +4,14 @@ import * as Utils from './utils';
 export type InputTypeOption = {
     label: string;
     value: string;
-}
+};
 
-export type InputType = {
-    name: string;
+export type InputType<N = string> = {
+    name: N;
     placeholder?: string;
     type?: string;
     options?: InputTypeOption[];
 };
-
 
 /**
  * Options for deriving input types from a ZodObject schema.
@@ -42,7 +41,32 @@ export type DeriveInputOptions = {
          */
         description?: boolean;
     }
-}
+};
+
+/**
+ * Traverse an object recursively and map all keys to literals.
+ *
+ * @example
+ * 
+ * type User = {
+ *   username: string;
+ *   password: string;
+ *   location: {
+ *     address: string;
+ *     zipcode: string;
+ *   }
+ * }
+ * 
+ * type Keys<T> = keys<T>;
+ * // Keys<User> === 'username' | 'password' | 'location.address' | 'location.zipcode'
+ */
+export type InlineKeys<T, P extends string = ''> = {
+    [K in keyof T]: T[K] extends Record<string, unknown>
+        ? InlineKeys<T[K], join<P & string, K & string>>
+        : join<P & string, K & string>;
+}[keyof T];
+
+type join<A extends string, B extends string> = A extends '' ? B : B extends '' ? A : `${A}.${B}`;
 
 /**
  * Derives an array of input types from a ZodObject schema.
@@ -53,7 +77,7 @@ export type DeriveInputOptions = {
 function deriveInputs<T extends z.ZodRawShape>(
     schema: z.ZodObject<T>,
     options: DeriveInputOptions = { outputName: 'inline' }
-) {
+): InputType<InlineKeys<T>>[] {
     const inputs: InputType[] = []; 
     const keys = Object.keys(schema.shape);
     const _options = {outputName: 'inline', ...options } as DeriveInputOptions;
@@ -77,12 +101,11 @@ function deriveInputs<T extends z.ZodRawShape>(
             if (Utils.isZodObject(element)) {
                 if (_options.outputName === 'inline') {
                     const addDescription = _options.object?.description !== false && element.description;
-                    console.log(addDescription);
                     if (addDescription) {
-                        inputs.push({ name: key, placeholder: element.description, type: 'fieldset' });
+                        inputs.push({ name: key, placeholder: element.description, type: 'divider' } as never);
                     }
 
-                    updateFromZodObjectAsInline(element, input, inputs, _options);
+                    updateFromZodObjectAsInline(element, input, inputs as never, _options);
                 } else if (_options.outputName === 'grouped') {
                     throw new Error('Not implemented');
                 }
@@ -94,7 +117,7 @@ function deriveInputs<T extends z.ZodRawShape>(
         }
     }
 
-    return inputs;
+    return inputs as never;
 }
 
 export default deriveInputs;

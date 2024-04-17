@@ -95,7 +95,18 @@ describe('deriveInputs', () => {
         });
 
         describe('options', () => {
-            it('sets fieldset if object description is set', () => {
+            it('sets divider type', () => {
+                const schema = z.object({ location: z
+                    .object({ ...location })
+                    .describe('Location')
+                });
+
+                const inputs = deriveInputs(schema);
+                expect(inputs[0].type).toEqual('divider');
+                
+            })
+
+            it('sets divider if object description is set', () => {
                 const schema = z.object({ ...user, location: z
                     .object({ ...location })
                     .describe('Location')
@@ -109,7 +120,7 @@ describe('deriveInputs', () => {
                     );
             });
 
-            it('does not set fieldset if object description is not set', () => {
+            it('does not set divider if object description is not set', () => {
                 const schema = z.object({ ...user, location: z.object({ ...location }) });
 
                 const inputs = deriveInputs(schema);
@@ -119,14 +130,13 @@ describe('deriveInputs', () => {
                     )
             });
 
-            it('dos not set fieldset if options object description is false', () => {
+            it('dos not set divider if options object description is false', () => {
                 const schema = z.object({ ...user, location: z
                     .object({ ...location })
                     .describe('Location')
                 });
 
                 const inputs = deriveInputs(schema, { object: { description: false } });
-                console.log(inputs);
                 expect(inputs.length).toEqual(
                     Object.keys(user).length + Object.keys(location).length
                 );
