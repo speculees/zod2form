@@ -103,31 +103,32 @@ describe('deriveInputs', () => {
 
                 const inputs = deriveInputs(schema);
                 expect(inputs[0].type).toEqual('divider');
-                
-            })
+            });
 
-            it('sets divider if object description is set', () => {
+            it('sets dividers if object description is set', () => {
                 const schema = z.object({ ...user, location: z
                     .object({ ...location })
                     .describe('Location')
                 });
 
-                const inputs = deriveInputs(schema);
+                // test default object description
+                expect(deriveInputs(schema).length).toEqual(
+                    Object.keys(user).length + Object.keys(location).length + 1
+                );
 
-                expect(inputs.length)
-                    .toEqual(
-                        Object.keys(user).length + Object.keys(location).length + 1
-                    );
+                // test adding root description
+                expect(deriveInputs(schema.describe('User')).length).toEqual(
+                    Object.keys(user).length + Object.keys(location).length + 2
+                );
             });
 
             it('does not set divider if object description is not set', () => {
                 const schema = z.object({ ...user, location: z.object({ ...location }) });
 
                 const inputs = deriveInputs(schema);
-                expect(inputs.length)
-                    .toEqual(
-                        Object.keys(user).length + Object.keys(location).length
-                    )
+                expect(inputs.length).toEqual(
+                    Object.keys(user).length + Object.keys(location).length
+                );
             });
 
             it('dos not set divider if options object description is false', () => {
