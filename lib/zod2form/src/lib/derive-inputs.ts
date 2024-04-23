@@ -8,6 +8,7 @@ export type InputTypeOption = {
 
 export type InputType<N = string> = {
     name: N;
+    readOnly: boolean;
     placeholder?: string;
     type?: string;
     options?: InputTypeOption[];
@@ -74,31 +75,51 @@ export type RequiredDeep<T> = {
 
 type join<A extends string, B extends string> = A extends '' ? B : B extends '' ? A : `${A}.${B}`;
 
+type InputSchema = z.ZodObject<z.ZodRawShape> | z.ZodReadonly<z.ZodObject<z.ZodRawShape>>;
+
 /**
  * Derives an array of input types from a ZodObject schema.
  *
  * @param {z.ZodObject<T>} schema - The ZodObject schema to derive inputs from.
  * @return {InputType[]} An array of input types derived from the schema.
  */
-function deriveInputs<T extends z.ZodObject<z.ZodRawShape>>(
+function deriveInputs<T extends InputSchema>(
     schema: T,
     options: DeriveInputOptions = { outputName: 'inline' }
 ): InputType<InlineKeys<RequiredDeep<z.infer<T>>>>[] {
+    let shape: z.ZodRawShape;
+    if (Utils.isZodObject(schema)) {
+        shape = schema.shape;
+    } else if (Utils.isZodReadonly(schema)) {
+        const _object = schema._def.innerType;
+        if (Utils.isZodObject(_object)) {
+            shape = _object.shape;
+        } else throw new Error('Invalid schema');
+    } else {
+        throw new Error('Invalid schema');
+    }
+
     const inputs: InputType[] = []; 
-    const keys = Object.keys(schema.shape);
+    const keys = Object.keys(shape);
     const _options = {
         outputName: 'inline',
         object: { description: true, ...options.object },
         ...options
     } as DeriveInputOptions;
-    updateDividerFromPlaceholder({ name: '', placeholder: schema.description, type: 'divider' }, inputs, _options);
+    let objReadOnly = false;
+    Utils.peel(schema, (item) =>  {
+        objReadOnly = objReadOnly || Utils.isZodReadonly(item);
+    });
+    updateDividerFromPlaceholder({ name: '', readOnly: objReadOnly, placeholder: schema.description, type: 'divider' }, inputs, _options);
 
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
 
-        if (Object.prototype.hasOwnProperty.call(schema.shape, key)) {
-            const input = { name: key } as InputType;
-            const element = Utils.peel(schema.shape[key], ({ description }) => {
+        if (Object.prototype.hasOwnProperty.call(shape, key)) {
+            const input = { name: key, readOnly: objReadOnly } as InputType;
+            const element = Utils.peel(shape[key], (item) => {
+                const { description } = item;
+                input.readOnly = input.readOnly || objReadOnly || Utils.isZodReadonly(item);
                 if (description) {
                     input.placeholder = description;
                 }

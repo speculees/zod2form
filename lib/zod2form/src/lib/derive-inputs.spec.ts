@@ -22,6 +22,39 @@ export const location = {
 
 describe('deriveInputs', () => {
 
+    describe('readonly', () => {
+        it('should apply readonly from object', () => {
+            const schema = z.object({ 
+                ...user,
+                location: z.object({ ...location })
+            }).readonly();
+            const inputs = deriveInputs(schema);
+
+            for (const input of inputs) {
+                // readonly is true when not in location object
+                expect(input.readOnly).toEqual(!input.name.includes('location'));
+            }
+        });
+
+        it('should apply readonly from object props', () => {
+            const schema = z.object({
+                id: user.id,
+                firstName: user.firstName.readonly(),
+                lastName: user.lastName.readonly(),
+                userName: user.userName,
+            });
+
+            const inputs = deriveInputs(schema);
+
+            expect(inputs.shift()?.readOnly).toEqual(false); // id
+            expect(inputs.pop()?.readOnly).toEqual(false); // userName
+
+            for (const input of inputs) {
+                expect(input.readOnly).toEqual(true);
+            }
+        });
+    });
+
     describe('string', () => {
         it('should derive type text', () => {
             const { firstName, lastName, userName } = user;
