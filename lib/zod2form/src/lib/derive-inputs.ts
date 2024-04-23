@@ -66,6 +66,12 @@ export type InlineKeys<T, P extends string = ''> = {
         : join<P & string, K & string>;
 }[keyof T];
 
+export type RequiredDeep<T> = {
+    [P in keyof T]-?: T[P] extends Record<string, unknown>
+        ? RequiredDeep<Required<T[P]>>
+        : Required<T[P]>;
+};
+
 type join<A extends string, B extends string> = A extends '' ? B : B extends '' ? A : `${A}.${B}`;
 
 /**
@@ -77,7 +83,7 @@ type join<A extends string, B extends string> = A extends '' ? B : B extends '' 
 function deriveInputs<T extends z.ZodObject<z.ZodRawShape>>(
     schema: T,
     options: DeriveInputOptions = { outputName: 'inline' }
-): InputType<InlineKeys<z.infer<T>>>[] {
+): InputType<InlineKeys<RequiredDeep<z.infer<T>>>>[] {
     const inputs: InputType[] = []; 
     const keys = Object.keys(schema.shape);
     const _options = {
