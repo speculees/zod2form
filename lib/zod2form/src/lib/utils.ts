@@ -28,6 +28,10 @@ export function isZodDefault(element: z.ZodTypeAny): element is z.ZodDefault<z.Z
    return element._def.typeName === 'ZodDefault'; 
 }
 
+export function isZodReadonly(element: z.ZodTypeAny): element is z.ZodReadonly<z.ZodTypeAny> {
+    return element._def.typeName === 'ZodReadonly';
+}
+
 export function peel(any: z.ZodTypeAny, callback?: (any: z.ZodTypeAny) => void) {
     if (callback) {
         callback(any);
