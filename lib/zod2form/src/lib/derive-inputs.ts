@@ -65,8 +65,7 @@ export type DeriveInputOptions = {
  *   }
  * }
  * 
- * type Keys<T> = keys<T>;
- * // Keys<User> === 'username' | 'password' | 'location.address' | 'location.zipcode'
+ * // InlineKeys<User> -> 'username' | 'password' | 'location.address' | 'location.zipcode'
  */
 export type InlineKeys<T, P extends string = ''> = {
     [K in keyof T]: T[K] extends Record<string, unknown>
