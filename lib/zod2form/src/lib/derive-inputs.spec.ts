@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import deriveInputs from './derive-inputs';
+import deriveInputs, { INPUT_HIDDEN } from './derive-inputs';
 
 export const user = {
     id: z.string().uuid().optional().default('123e4567-e89b-12d3-a456-426614174000'),
@@ -81,13 +81,35 @@ describe('deriveInputs', () => {
 
         it('should derive type hidden', () => {
             const schema = z.object({ 
-                cuid: z.string().cuid().optional(),
-                cuid2: z.string().cuid2().optional(),
-                uuid: z.string().uuid().optional(),
+                cuid: z.string().cuid().describe(INPUT_HIDDEN + 'CUID').optional(),
+                cuid2: z.string().cuid2().optional().describe(INPUT_HIDDEN + 'CUID2'),
+                uuid: z.string().describe(INPUT_HIDDEN + 'UUID').uuid().optional(),
                 ulid: z.string().ulid().optional(),
             });
+
             const inputs = deriveInputs(schema);
-            expect(inputs[0].type).toEqual('hidden');
+
+            expect(inputs.pop()?.type).toEqual('text');
+
+            for (const input of inputs) {
+                expect(input.type).toEqual('hidden');
+            }
+        });
+
+        it('should derive type hidden with description in root', () => {
+            const schema = z.object({ 
+                cuid: z.string().cuid().describe(INPUT_HIDDEN + 'CUID').optional(),
+                cuid2: z.string().cuid2().optional().describe('CUID2'),
+                uuid: z.string().describe(INPUT_HIDDEN + 'UUID').uuid().optional(),
+                ulid: z.string().ulid().optional(),
+                text: z.string(),
+                number: z.number(),
+            }).describe(INPUT_HIDDEN + 'ID');
+
+            const inputs = deriveInputs(schema, { object: { description: false } });
+            for (const input of inputs) {
+                expect(input.type).toEqual('hidden');
+            }
         });
     });
 

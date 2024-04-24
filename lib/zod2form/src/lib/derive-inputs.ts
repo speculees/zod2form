@@ -1,6 +1,13 @@
 import * as z from 'zod';
 import * as Utils from './utils';
 
+/**
+ * Token used to identify hidden inputs.
+ * Placed at the start of an description string.
+ * Short for 'input hidden'.
+ */
+export const INPUT_HIDDEN = '_ih_';
+
 export type InputTypeOption = {
     label: string;
     value: string;
@@ -58,8 +65,7 @@ export type DeriveInputOptions = {
  *   }
  * }
  * 
- * type Keys<T> = keys<T>;
- * // Keys<User> === 'username' | 'password' | 'location.address' | 'location.zipcode'
+ * // InlineKeys<User> -> 'username' | 'password' | 'location.address' | 'location.zipcode'
  */
 export type InlineKeys<T, P extends string = ''> = {
     [K in keyof T]: T[K] extends Record<string, unknown>
@@ -67,12 +73,50 @@ export type InlineKeys<T, P extends string = ''> = {
         : join<P & string, K & string>;
 }[keyof T];
 
+/**
+ * Make all keys in an object required, recursively.
+ * 
+ * @example
+ * 
+ * type User = {
+ *   username: string;
+ *   location?: {
+ *     address?: string;
+ *     zipcode?: string;
+ *   }
+ * }
+ * 
+ * // RequiredDeep<User> -> {
+ * //   username: string;
+ * //   location: {
+ * //     address: string;
+ * //     zipcode: string;
+ * //   }
+ * // }
+ */
 export type RequiredDeep<T> = {
     [P in keyof T]-?: T[P] extends Record<string, unknown>
         ? RequiredDeep<Required<T[P]>>
         : Required<T[P]>;
 };
 
+/**
+ * Concatenate two strings with a dot as a separator.
+ *
+ * @template A The first string.
+ * @template B The second string.
+ *
+ * @returns The concatenated string. If either of the input strings is empty,
+ * the other string is returned. If both input strings are empty, an empty
+ * string is returned.
+ *
+ * @example
+ *
+ * type Result1 = join<'foo', 'bar'>; // 'foo.bar'
+ * type Result2 = join<'', 'bar'>; // 'bar'
+ * type Result3 = join<'foo', ''>; // 'foo'
+ * type Result4 = join<'' , '' >; // ''
+ */
 type join<A extends string, B extends string> = A extends '' ? B : B extends '' ? A : `${A}.${B}`;
 
 type InputSchema = z.ZodObject<z.ZodRawShape> | z.ZodReadonly<z.ZodObject<z.ZodRawShape>>;
@@ -106,24 +150,40 @@ function deriveInputs<T extends InputSchema>(
         object: { description: true, ...options.object },
         ...options
     } as DeriveInputOptions;
-    let objReadOnly = false;
-    Utils.peel(schema, (item) =>  {
+    let objReadOnly = false, objHidden = false;
+    Utils.peel(schema, (item) =>  { 
         objReadOnly = objReadOnly || Utils.isZodReadonly(item);
+        objHidden = objHidden || isHiddenType(item.description);
     });
-    updateDividerFromPlaceholder({ name: '', readOnly: objReadOnly, placeholder: schema.description, type: 'divider' }, inputs, _options);
+    updateDividerFromPlaceholder({
+        name: '',
+        readOnly: objReadOnly,
+        placeholder: objHidden ? schema.description?.slice(INPUT_HIDDEN.length) : schema.description,
+        type: 'divider'
+    }, inputs, _options);
 
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
 
         if (Object.prototype.hasOwnProperty.call(shape, key)) {
             const input = { name: key, readOnly: objReadOnly } as InputType;
+            if (objHidden) input.type = 'hidden';
+
             const element = Utils.peel(shape[key], (item) => {
-                const { description } = item;
                 input.readOnly = input.readOnly || objReadOnly || Utils.isZodReadonly(item);
+                
+                const { description } = item;
                 if (description) {
-                    input.placeholder = description;
+                    const hidden = isHiddenType(description);
+                    input.type = input.type === 'hidden' || objHidden || hidden ? 'hidden' : undefined;
+                    input.placeholder = hidden ? description.slice(INPUT_HIDDEN.length) : description;
                 }
             }) as z.ZodNumber;
+
+            if (input.type === 'hidden') {
+                inputs.push(input);
+                continue;
+            }
 
             updateFromZodString(element, input);
             updateFromZodNumber(element, input);
@@ -149,6 +209,10 @@ function deriveInputs<T extends InputSchema>(
 
 export default deriveInputs;
 
+function isHiddenType(description = '') {
+    return description.startsWith(INPUT_HIDDEN);
+}
+
 function updateDividerFromPlaceholder(input: InputType, inputs: InputType[], options: DeriveInputOptions) {
     const addDescription = options.object?.description !== false && input.placeholder;
     if (addDescription) {
@@ -162,16 +226,9 @@ function updateFromZodString(element: z.ZodTypeAny, input: InputType) {
             input.type = 'url';
         } else if (element.isEmail) {
             input.type = 'email';
-        } else if (element.isCUID
-            || element.isCUID2
-            || element.isUUID
-            || element.isULID
-        ) {
-            input.type = 'hidden';
         } else {
             input.type = 'text';
         }
-
     }
 }
 
