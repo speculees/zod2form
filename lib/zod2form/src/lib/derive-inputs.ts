@@ -74,12 +74,50 @@ export type InlineKeys<T, P extends string = ''> = {
         : join<P & string, K & string>;
 }[keyof T];
 
+/**
+ * Make all keys in an object required, recursively.
+ * 
+ * @example
+ * 
+ * type User = {
+ *   username: string;
+ *   location?: {
+ *     address?: string;
+ *     zipcode?: string;
+ *   }
+ * }
+ * 
+ * // RequiredDeep<User> -> {
+ * //   username: string;
+ * //   location: {
+ * //     address: string;
+ * //     zipcode: string;
+ * //   }
+ * // }
+ */
 export type RequiredDeep<T> = {
     [P in keyof T]-?: T[P] extends Record<string, unknown>
         ? RequiredDeep<Required<T[P]>>
         : Required<T[P]>;
 };
 
+/**
+ * Concatenate two strings with a dot as a separator.
+ *
+ * @template A The first string.
+ * @template B The second string.
+ *
+ * @returns The concatenated string. If either of the input strings is empty,
+ * the other string is returned. If both input strings are empty, an empty
+ * string is returned.
+ *
+ * @example
+ *
+ * type Result1 = join<'foo', 'bar'>; // 'foo.bar'
+ * type Result2 = join<'', 'bar'>; // 'bar'
+ * type Result3 = join<'foo', ''>; // 'foo'
+ * type Result4 = join<'' , '' >; // ''
+ */
 type join<A extends string, B extends string> = A extends '' ? B : B extends '' ? A : `${A}.${B}`;
 
 type InputSchema = z.ZodObject<z.ZodRawShape> | z.ZodReadonly<z.ZodObject<z.ZodRawShape>>;
