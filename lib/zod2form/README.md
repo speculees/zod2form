@@ -1,6 +1,4 @@
-# zod2form
-
-This library was generated with [Nx](https://nx.dev).
+# zod2form lib
 
 Zod2form is a library that helps you to create a form from a zod schema. This first version is meant to be used with [react-hook-form](https://react-hook-form.com).
 
@@ -48,8 +46,13 @@ const Form: React.FC = () => {
 }
 ```
 
-In the above example, the default values are derived from the zod schema. The default values object must respect the zod schema. In the above example the object is `{ name: 'John', age: 25 }`.
-The inputs are derived from the zod schema. The inputs are an array of objects with the following properties: `name`, `readOnly`, `placeholder`, `type`.
+### Deriving default values from a zod schema
+
+In the above example, the default values are derived from the zod schema using the `deriveDefaultValues` function. The default values object must respect the zod schema. In the above example the output object is `{ name: 'John', age: 25 }`.
+
+### Deriving inputs from a zod schema
+
+The inputs are derived from the zod schema using the `deriveInputs` function. The output of the function is an array of objects with the following properties: `name`, `readOnly`, `placeholder`, `type`.
 
 In the above example, the inputs are:
 
@@ -94,17 +97,9 @@ Run `nx build zod2form` to build the library.
 
 Run `nx test zod2form` to execute the unit tests via [Jest](https://jestjs.io).
 
-## TODO
-
-- [ ] Add react examples (react-hook-form)
-- [ ] Add support for grouped nested inputs
-- [x] Add support for inline nested inputs
-- [ ] Add support for array inputs
-- [x] Add support for basic inputs (checkbox, text, select, number, hidden)
-
 ## Contributing
 
-This project welcomes contributions. See [CONTRIBUTING.md](https://github.com/speculees/zod2form/blob/main/CONTRIBUTING.md) for details.
+This project welcomes contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 
