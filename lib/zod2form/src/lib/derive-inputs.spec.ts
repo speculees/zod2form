@@ -2,6 +2,7 @@ import * as z from 'zod';
 import deriveInputs, { INPUT_HIDDEN } from './derive-inputs';
 
 export const user = {
+    type: z.literal('USER'),
     id: z.string().uuid().optional().default('123e4567-e89b-12d3-a456-426614174000'),
     firstName: z.string().optional().describe('First Name').default('John'),
     lastName: z.string().optional().default('Doe'),
@@ -13,6 +14,7 @@ export const user = {
 };
 
 export const location = {
+    type: z.literal('LOCATION'),
     address: z.string().optional().describe('Address'),
     city: z.string().optional().describe('City'),
     state: z.string().optional().describe('State'),
@@ -21,6 +23,33 @@ export const location = {
 };
 
 describe('deriveInputs', () => {
+
+    describe('literal', () => {
+        it('should derive type text', () => {
+            const schema = z.object({ type: z.literal('USER') });
+            const inputs = deriveInputs(schema);
+            expect(inputs[0].type).toEqual('text');
+        });
+
+        it('should derive type number', () => {
+            const schema = z.object({ type: z.literal(0) });
+            const inputs = deriveInputs(schema);
+            expect(inputs[0].type).toEqual('number');
+        });
+
+        it('should derive type checkbox', () => {
+            const schema = z.object({ type: z.literal(true) });
+            const inputs = deriveInputs(schema);
+            expect(inputs[0].type).toEqual('checkbox');
+        });
+
+        it('should derive type hidden', () => {
+            const schema = z.object({ type: z.literal(Symbol('terrific')) });
+            const inputs = deriveInputs(schema);
+            expect(inputs[0].type).toEqual('hidden');
+        });
+
+    });
 
     describe('readonly', () => {
         it('should apply readonly from object', () => {
