@@ -8,7 +8,10 @@
   ],
   "description": "Parse zod schema to form inputs and default values",
   "keywords": [
-    "zod", "form", "react", "react-hook-form"
+    "zod",
+    "form",
+    "react",
+    "react-hook-form"
   ],
   "homepage": "https://github.com/speculees/zod2form#readme",
   "repository": {
@@ -22,6 +25,7 @@
     "tslib": "^2.6.2"
   },
   "peerDependencies": {
-    "zod": "3.*"
+    "zod": "3.*",
+    "tslib": "^2.3.0"
   }
 }
