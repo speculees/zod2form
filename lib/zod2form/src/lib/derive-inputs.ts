@@ -189,6 +189,7 @@ function deriveInputs<T extends InputSchema>(
             updateFromZodNumber(element, input);
             updateFromZodBoolean(element, input);
             updateFromZodUnion(element, input);
+            updateFromZodLiteral(element, input);
 
             if (Utils.isZodObject(element)) {
                 if (_options.outputName === 'inline') {
@@ -277,5 +278,26 @@ function updateFromZodObjectAsInline(element: z.ZodObject<z.ZodRawShape>, input:
     for (const _input of _inputs as InputType[]) {
         _input.name = `${input.name}.${_input.name}`;
         inputs.push(_input);
+    }
+}
+
+function updateFromZodLiteral(element: z.ZodTypeAny, input: InputType) {
+    if (Utils.isZodLiteral(element)) {
+        const type = typeof element.value;
+        switch (type) {
+            case 'number':
+            case 'bigint':
+                input.type = 'number'; 
+                break;
+            case 'boolean':
+                input.type = 'checkbox';
+                break;
+            case 'string':
+                input.type = 'text';
+                break;
+            default:
+                input.type = 'hidden';
+                break;
+        }
     }
 }

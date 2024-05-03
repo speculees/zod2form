@@ -30,6 +30,10 @@ function deriveDefaultValues<S extends ObjectRawShape = ObjectRawShape>(schema: 
         if (Utils.isZodObject(element)) {
             defaultValues[key] = deriveDefaultValues(element);
         }
+
+        if (Utils.isZodLiteral(element)) {
+            defaultValues[key] = element.value;
+        }
     }
 
     return defaultValues;

@@ -14,6 +14,7 @@ describe('deriveDefaultValues', () => {
             "isActive": true,
             "lastName": "Doe",
             "picture": "https://i.pravatar.cc/300",
+            "type": "USER",
             "userName": "johndoe",
         });
     });
@@ -26,6 +27,7 @@ describe('deriveDefaultValues', () => {
             "city": '',
             "country": '',
             "state": '',
+            "type": "LOCATION",
             "zipcode": ''
         });
     });
@@ -42,12 +44,14 @@ describe('deriveDefaultValues', () => {
             "lastName": "Doe",
             "picture": "https://i.pravatar.cc/300",
             "userName": "johndoe",
+            "type": "USER",
             "location": {
                 "address": '',
                 "city": '',
                 "country": '',
                 "state": '',
-                "zipcode": ''
+                "type": "LOCATION",
+                "zipcode": '',
             },
         });
     })
