@@ -1,49 +1,30 @@
-import NxWelcome from './nx-welcome';
-
 import { Route, Routes, Link } from 'react-router-dom';
+import GettingStarted from './getting-started';
+import Examples from './examples';
+import Welcome from './welcome';
 
 export function App() {
   return (
-    <div>
-      <NxWelcome title="react-demo" />
+    <>
+    <header className="sticky top-0 w-full z-10 flex p-2 items-center justify-between bg-slate-100 border-b">
+      <Link to="/">
+        <h1>zod2form (z2f)</h1>
+      </Link>
 
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </div>
+      <nav className="flex gap-2">
+        <Link to="/getting-started">Getting Started</Link>  
+        <Link to="/examples">Examples</Link>  
+      </nav>
+    </header>
+
+     <main className="p-2">
       <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
+        <Route path="/" element={<Welcome />} />
+        <Route path="/getting-started" element={<GettingStarted />} />
+        <Route path="/examples" element={<Examples />} />
       </Routes>
-      {/* END: routes */}
-    </div>
+     </main>
+    </>
   );
 }
 
