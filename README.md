@@ -2,6 +2,10 @@
 
 Zod2form is a library that helps you to create a form from a zod schema.
 
+## Demo
+
+See [react hook form demo](https://speculees.github.io/zod2form/#/examples)
+
 ## Installation
 
 ### Library
@@ -40,11 +44,11 @@ The project contains the [zod2form lib](lib/zod2form/README.md) and the [example
 
 ## TODO
 
-- [ ] Add react examples (react-hook-form)
-- [ ] Add support for grouped nested inputs
-- [x] Add support for inline nested inputs (react-hook-form)
-- [ ] Add support for array inputs
 - [x] Add support for basic inputs (checkbox, text, select, number, hidden)
+- [x] Add support for inline nested inputs (react-hook-form)
+- [x] Add react examples (react-hook-form)
+- [ ] Add support for array inputs
+- [ ] Add support for grouped nested inputs
 
 ## Contributing
 
