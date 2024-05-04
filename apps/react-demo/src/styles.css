@@ -2,3 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 /* You can add global styles to this file, and also import other style files */
+
+.form-wrapper form {
+  display: flex;
+  gap: theme('spacing.1');
+  flex-direction: column;
+}
+
+.form-wrapper form input {
+  border: theme('colors.blue.500') 1px solid;
+}
+
+.form-wrapper form button {
+  background-color: theme('colors.blue.500');
+  padding: theme('spacing.1');
+  color: theme('colors.white');
+}
