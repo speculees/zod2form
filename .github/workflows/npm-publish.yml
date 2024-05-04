@@ -12,22 +12,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v3
         with:
-          node-version: 16
-      - run: npm ci
-      - run: npm test
+          version: 8 
+      - run: pnpm install --frozen-lockfile
+      - run: pnpx nx run @speculees/zod2form:build 
 
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
+      - run: pnpm install --frozen-lockfile
+      - run: cd dist/lib/zod2form && npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
