@@ -45,7 +45,7 @@ const Welcome: React.FC = () => {
         focus. So for now...
         <img
           className="my-4"
-          src="/assets/doc-1.gif"
+          src="./assets/doc-1.gif"
           alt="please excuse the crudity of this model"
         />
         Until then, feel free to explore the{' '}
@@ -60,7 +60,7 @@ const Welcome: React.FC = () => {
         repository, and thank you for your interest in z2f!
         <img
           className="my-4"
-          src="/assets/doc-2.gif"
+          src="./assets/doc-2.gif"
           alt="See you in the future"
         />
       </p>

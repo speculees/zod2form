@@ -3,14 +3,6 @@ const { NxReactWebpackPlugin } = require('@nx/react');
 const { join } = require('path');
 
 module.exports = {
-  // module: {
-  //   rules: [
-  //     {
-  //       test: /\.tsx$/i,
-  //       use: 'raw-loader',
-  //     }
-  //   ]
-  // },
   output: {
     path: join(__dirname, '../../dist/react-demo'),
   },
@@ -24,7 +16,7 @@ module.exports = {
       compiler: 'babel',
       main: './src/main.tsx',
       index: './src/index.html',
-      baseHref: '/',
+      baseHref: process.env['NODE_ENV'] === 'production' ? '/zod2form/' : '/',
       assets: ['./src/favicon.ico', './src/assets'],
       styles: ['./src/styles.css'],
       outputHashing: process.env['NODE_ENV'] === 'production' ? 'all' : 'none',
